@@ -59,3 +59,54 @@ input { width: 80%; padding: 12px; margin: 10px 0; background: #000; border: 1px
 
 
 
+/* Die Karte (Login-Feld) */
+.card {
+    background: rgba(0, 0, 0, 0.6); /* Dunklerer Hintergrund für mehr Kontrast */
+    backdrop-filter: blur(15px);
+    border: 2px solid var(--neon-blue);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 0 25px rgba(0, 212, 255, 0.3);
+    
+    /* WICHTIG: Alles darin zentrieren */
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center;
+    width: 100%;
+}
+
+/* Die Eingabefelder */
+input {
+    width: 100%;
+    max-width: 300px; /* Damit es auf dem PC nicht zu breit wird */
+    padding: 15px;
+    margin: 12px 0;
+    
+    /* Schwarzer Hintergrund & Neon-Rahmen */
+    background: #000000; 
+    border: 1px solid var(--neon-pink);
+    border-radius: 10px;
+    
+    color: white;
+    font-family: var(--font-main);
+    font-size: 1rem;
+    text-align: center;
+    
+    /* Glow-Effekt beim Reinklicken */
+    transition: box-shadow 0.3s, border-color 0.3s;
+    outline: none;
+}
+
+input:focus {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 10px var(--neon-blue);
+}
+
+/* Der Button innerhalb der Karte */
+.btn-primary {
+    width: 100%;
+    max-width: 300px;
+    margin-top: 10px;
+    cursor: pointer;
+}
