@@ -7,7 +7,7 @@ function join() {
     if(name && code) {
         socket.emit('joinGame', { name: name, code: code });
     } else {
-        alert("Bitte Name und Code eingeben!");
+        alert("Name und Code fehlen!");
     }
 }
 
@@ -19,37 +19,50 @@ socket.on('playerAccepted', () => {
 document.getElementById('click-button').addEventListener('click', () => {
     currentScore += 10;
     socket.emit('playerClick', { score: currentScore });
-    
-    // Kleiner visueller Kick
     const btn = document.getElementById('click-button');
     btn.style.transform = "scale(0.95)";
     setTimeout(() => btn.style.transform = "scale(1)", 50);
 });
 
-// --- TIMER & GAME LOGIK ---
+socket.on('updateScoreboard', (players) => {
+    const board = document.getElementById('scoreboard');
+    board.innerHTML = '';
+    players.sort((a, b) => b.score - a.score);
+
+    players.forEach(player => {
+        // Berechnung für 10.000 Punkte Limit
+        const progressPercent = Math.min((player.score / 10000) * 100, 100);
+        
+        const row = document.createElement('div');
+        row.className = 'player-row';
+        row.innerHTML = `
+            <span class="player-name">${player.name}</span>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: ${progressPercent}%"></div>
+            </div>
+            <span class="score-val">${player.score}</span>
+        `;
+        board.appendChild(row);
+    });
+});
+
 socket.on('timerUpdate', (time) => {
     const timerDiv = document.getElementById('timer');
     timerDiv.innerText = `00:${time < 10 ? '0' + time : time}`;
-    if(time <= 10) timerDiv.style.color = "#ff00ff"; // Pinker Alarm am Ende
+    if(time <= 10) timerDiv.style.color = "#ff00ff";
 });
 
 socket.on('gameStarted', () => {
     currentScore = 0;
     document.getElementById('timer').style.color = "#00d4ff";
-    console.log("Die Jagd beginnt!");
 });
 
 socket.on('gameFinished', (winner) => {
-    if (winner) {
-        alert(`🏆 GEWINNER: ${winner.name} mit ${winner.score} Punkten!`);
-    }
+    if (winner) alert(`🏆 SIEGER: ${winner.name} mit ${winner.score} Punkten!`);
 });
 
-socket.on('gameReset', () => {
-    location.reload(); // Einfachster Weg für einen sauberen Reset
-});
+socket.on('gameReset', () => location.reload());
 
-// --- BOOST LOGIK ---
 function spawnBonusLogo() {
     const logo = document.createElement('img');
     logo.src = 'image/logo.jpeg'; 
@@ -57,6 +70,8 @@ function spawnBonusLogo() {
     logo.style.position = 'fixed';
     logo.style.zIndex = '9999';
     logo.style.width = '80px';
+    logo.style.height = '80px';
+    logo.style.borderRadius = '50%';
     
     const x = Math.random() * (window.innerWidth - 100);
     const y = Math.random() * (window.innerHeight - 100);
@@ -73,20 +88,4 @@ function spawnBonusLogo() {
 }
 
 socket.on('spawnBoost', () => spawnBonusLogo());
-
-socket.on('updateScoreboard', (players) => {
-    const board = document.getElementById('scoreboard');
-    board.innerHTML = '';
-    players.sort((a, b) => b.score - a.score);
-    players.forEach(player => {
-        const row = document.createElement('div');
-        row.className = 'player-row';
-        row.innerHTML = `
-            <span class="player-name">${player.name}</span>
-            <div class="progress-container"><div class="progress-bar" style="width: ${Math.min(player.score / 10, 100)}%"></div></div>
-            <span class="score-val">${player.score}</span>`;
-        board.appendChild(row);
-    });
-});
-
 socket.on('error', (msg) => alert(msg));

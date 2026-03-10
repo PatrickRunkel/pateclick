@@ -9,7 +9,6 @@ const io = new Server(server);
 
 app.use(express.static('public'));
 
-// GLOBALER STATUS
 let players = [];
 let gameTimer = null;
 let timeLeft = 60;
@@ -37,9 +36,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('adminStartGame', () => {
-        console.log("Admin startet die Runde...");
         if (gameTimer) clearInterval(gameTimer);
-        
         timeLeft = 60;
         players.forEach(p => p.score = 0);
         io.emit('updateScoreboard', players);
@@ -48,10 +45,7 @@ io.on('connection', (socket) => {
         gameTimer = setInterval(() => {
             timeLeft--;
             io.emit('timerUpdate', timeLeft);
-
-            if (Math.random() < 0.15) { 
-                io.emit('spawnBoost');
-            }
+            if (Math.random() < 0.15) io.emit('spawnBoost');
 
             if (timeLeft <= 0) {
                 clearInterval(gameTimer);
@@ -79,4 +73,4 @@ io.on('connection', (socket) => {
 });
 
 const PORT = 3000;
-server.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
+server.listen(PORT, () => console.log(`PateGames läuft auf Port ${PORT}`));
