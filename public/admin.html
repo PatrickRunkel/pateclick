@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>PateGames Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-box { margin-top: 50px; border-color: #ff00ff; }
+        .control-btn { margin: 10px; padding: 20px; font-size: 1.2rem; cursor: pointer; }
+        .status { color: #00ff00; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div class="card admin-box">
+            <h1>ADMIN PANEL</h1>
+            <p>Status: <span id="game-status" class="status">Bereit</span></p>
+            <hr>
+            <button class="btn-primary control-btn" onclick="startGame()">RUNDE STARTEN</button>
+            <button class="btn-primary control-btn" style="background: red;" onclick="resetGame()">RESET</button>
+            <hr>
+            <div class="ticket-control">
+                <h3>Ticket Verkauf</h3>
+                <button id="ticket-toggle" class="btn-primary" onclick="toggleTickets()">DEAKTIVIEREN</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        function startGame() { socket.emit('adminStartGame'); }
+        function resetGame() { socket.emit('adminResetGame'); }
+        function toggleTickets() { /* Logik folgt */ }
+    </script>
+</body>
+</html>

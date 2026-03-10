@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PateClick | LIVE</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="game-container">
+        <div class="logo-wrapper">
+            <img src="image/logo.jpeg" alt="PateClick Logo" class="main-logo">
+        </div>
+
+        <div id="timer">00:60</div>
+
+        <div id="login-screen" class="card">
+            <h2>SPIELER-LOGIN</h2>
+            <input type="text" id="playerName" placeholder="DEIN NAME">
+            <input type="text" id="ticketCode" placeholder="TICKET-CODE">
+            <button class="btn-primary" onclick="join()">JETZT BEITRETEN</button>
+        </div>
+
+        <div id="battle-arena" class="hidden">
+            <div id="scoreboard">
+                <div class="player-row">
+                    <span class="player-name">Spieler 1</span>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 70%;"></div>
+                    </div>
+                    <span class="score-val">700</span>
+                </div>
+            </div>
+
+            <div class="action-zone">
+                <button id="click-button">CLICK!</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
