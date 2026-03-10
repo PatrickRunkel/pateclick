@@ -67,14 +67,28 @@ function spawnBonusLogo() {
     const logo = document.createElement('img');
     logo.src = 'image/logo.jpeg'; 
     logo.className = 'bonus-logo';
-    logo.style.position = 'fixed';
-    logo.style.zIndex = '9999';
-    logo.style.width = '80px';
-    logo.style.height = '80px';
-    logo.style.borderRadius = '50%';
     
-    const x = Math.random() * (window.innerWidth - 100);
-    const y = Math.random() * (window.innerHeight - 100);
+    // Styling direkt im JS für maximale Kontrolle
+    logo.style.position = 'fixed'; 
+    logo.style.zIndex = '9999';
+    
+    // Größe anpassen - 'contain' sorgt dafür, dass nichts verzerrt
+    logo.style.width = '90px';
+    logo.style.height = '90px';
+    logo.style.objectFit = 'contain'; 
+    
+    // Design-Finish
+    logo.style.backgroundColor = 'rgba(0, 0, 0, 0.4)'; // Leichter dunkler Hintergrund
+    logo.style.borderRadius = '50%'; // Macht den Hintergrund rund
+    logo.style.padding = '5px'; // Abstand zum Rand
+    logo.style.border = '2px solid var(--neon-blue)';
+    logo.style.boxShadow = '0 0 20px var(--neon-blue)';
+    logo.style.cursor = 'pointer';
+
+    // Zufällige Position
+    const x = Math.random() * (window.innerWidth - 120);
+    const y = Math.random() * (window.innerHeight - 120);
+    
     logo.style.left = x + 'px';
     logo.style.top = y + 'px';
     
@@ -83,7 +97,10 @@ function spawnBonusLogo() {
         socket.emit('playerClick', { score: currentScore });
         logo.remove();
     };
+    
     document.body.appendChild(logo);
+    
+    // Verschwindet nach 2 Sekunden
     setTimeout(() => { if(logo.parentNode) logo.remove(); }, 2000);
 }
 

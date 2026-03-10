@@ -38,3 +38,24 @@ input { width: 80%; padding: 12px; margin: 10px 0; background: #000; border: 1px
 .hidden { display: none; }
 .bonus-logo { cursor: pointer; filter: drop-shadow(0 0 15px var(--neon-blue)); animation: pulse 0.5s infinite alternate; }
 @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+.bonus-logo {
+    transition: transform 0.1s active;
+    /* Verhindert, dass man das Bild blau markiert beim schnellen Klicken */
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* Animation wenn das Logo erscheint */
+@keyframes logoAppear {
+    0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+    70% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.bonus-logo {
+    animation: logoAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), pulse 0.5s infinite alternate;
+}
+
+
+
