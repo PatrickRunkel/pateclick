@@ -1,3 +1,18 @@
+document.addEventListener('touchstart', function (event) {
+    if (event.touches.length > 1) {
+        event.preventDefault(); // Verhindert Multi-Touch Zoom
+    }
+}, { passive: false });
+
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+    let now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault(); // Verhindert Doppelklick-Zoom
+    }
+    lastTouchEnd = now;
+}, false);
+
 const socket = io();
 let currentScore = 0;
 
@@ -103,6 +118,8 @@ function spawnBonusLogo() {
     // Verschwindet nach 2 Sekunden
     setTimeout(() => { if(logo.parentNode) logo.remove(); }, 2000);
 }
+
+
 
 socket.on('spawnBoost', () => spawnBonusLogo());
 socket.on('error', (msg) => alert(msg));

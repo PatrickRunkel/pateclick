@@ -110,3 +110,40 @@ input:focus {
     margin-top: 10px;
     cursor: pointer;
 }
+
+html, body {
+    /* Verhindert horizontales Scrollen und fixiert den Viewport */
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    position: fixed; /* Fixiert den Hintergrund gegen "Gummiband"-Effekt beim iPhone */
+}
+
+input {
+    /* iPhones zoomen nicht, wenn die Schrift 16px oder größer ist */
+    font-size: 16px !important; 
+    /* Verhindert Standard-iOS-Styling, das Zentrierung stören könnte */
+    -webkit-appearance: none;
+}
+
+#click-button {
+    /* Deaktiviert den Zoom-Effekt bei schnellem Tippen auf dem Button */
+    touch-action: manipulation;
+    /* Verhindert das Markieren von Text/Bildern beim schnellen Klicken */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent; /* Entfernt den grauen Kasten beim Tippen */
+}
+
+#game-container {
+    /* Zentriert alles absolut im sichtbaren Bereich */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+}
