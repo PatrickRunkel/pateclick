@@ -1,3 +1,4 @@
+// --- ANTI-ZOOM & MULTI-TOUCH FIX (iOS) ---
 document.addEventListener('touchstart', function (event) {
     if (event.touches.length > 1) {
         event.preventDefault(); // Verhindert Multi-Touch Zoom
@@ -13,8 +14,10 @@ document.addEventListener('touchend', function (event) {
     lastTouchEnd = now;
 }, false);
 
+// --- HAUPT-LOGIK ---
 const socket = io();
 let currentScore = 0;
+const clickBtn = document.getElementById('click-button');
 
 function join() {
     const name = document.getElementById('playerName').value;
@@ -26,19 +29,38 @@ function join() {
     }
 }
 
+// --- SPIELER BEITRITT ---
 socket.on('playerAccepted', () => {
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('battle-arena').classList.remove('hidden');
 });
 
-document.getElementById('click-button').addEventListener('click', () => {
+// --- OPTIMIERTE KLICK-FUNKTION (Touch & Mouse) ---
+function handleTap(e) {
+    if (e) e.preventDefault(); // Stoppt Browser-Interaktion (Zoom/Scroll)
+    
     currentScore += 10;
     socket.emit('playerClick', { score: currentScore });
-    const btn = document.getElementById('click-button');
-    btn.style.transform = "scale(0.95)";
-    setTimeout(() => btn.style.transform = "scale(1)", 50);
-});
+    
+    // Visuelles Feedback
+    clickBtn.style.transform = "scale(0.92)";
+    setTimeout(() => {
+        clickBtn.style.transform = "scale(1)";
+    }, 40);
+}
 
+// Event-Listener für sofortige Reaktion auf dem iPhone
+if (clickBtn) {
+    clickBtn.addEventListener('touchstart', handleTap, { passive: false });
+    clickBtn.addEventListener('mousedown', (e) => {
+        // Verhindert Doppel-Zählung: Wenn Touch verfügbar ist, ignoriere Mouse-Events
+        if (!('ontouchstart' in window)) {
+            handleTap(e);
+        }
+    });
+}
+
+// --- SCOREBOARD UPDATES ---
 socket.on('updateScoreboard', (players) => {
     const board = document.getElementById('scoreboard');
     board.innerHTML = '';
@@ -61,15 +83,19 @@ socket.on('updateScoreboard', (players) => {
     });
 });
 
+// --- TIMER & GAME EVENTS ---
 socket.on('timerUpdate', (time) => {
     const timerDiv = document.getElementById('timer');
-    timerDiv.innerText = `00:${time < 10 ? '0' + time : time}`;
-    if(time <= 10) timerDiv.style.color = "#ff00ff";
+    if (timerDiv) {
+        timerDiv.innerText = `00:${time < 10 ? '0' + time : time}`;
+        if(time <= 10) timerDiv.style.color = "#ff00ff";
+    }
 });
 
 socket.on('gameStarted', () => {
     currentScore = 0;
-    document.getElementById('timer').style.color = "#00d4ff";
+    const timerDiv = document.getElementById('timer');
+    if (timerDiv) timerDiv.style.color = "#00d4ff";
 });
 
 socket.on('gameFinished', (winner) => {
@@ -78,48 +104,47 @@ socket.on('gameFinished', (winner) => {
 
 socket.on('gameReset', () => location.reload());
 
+// --- BONUS LOGO (BOOST) ---
 function spawnBonusLogo() {
     const logo = document.createElement('img');
     logo.src = 'image/logo.jpeg'; 
     logo.className = 'bonus-logo';
     
-    // Styling direkt im JS für maximale Kontrolle
+    // Styling für iPhone & Desktop Performance
     logo.style.position = 'fixed'; 
     logo.style.zIndex = '9999';
-    
-    // Größe anpassen - 'contain' sorgt dafür, dass nichts verzerrt
     logo.style.width = '90px';
     logo.style.height = '90px';
     logo.style.objectFit = 'contain'; 
-    
-    // Design-Finish
-    logo.style.backgroundColor = 'rgba(0, 0, 0, 0.4)'; // Leichter dunkler Hintergrund
-    logo.style.borderRadius = '50%'; // Macht den Hintergrund rund
-    logo.style.padding = '5px'; // Abstand zum Rand
+    logo.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+    logo.style.borderRadius = '50%';
+    logo.style.padding = '5px';
     logo.style.border = '2px solid var(--neon-blue)';
     logo.style.boxShadow = '0 0 20px var(--neon-blue)';
     logo.style.cursor = 'pointer';
+    logo.style.touchAction = 'none'; // Ganz wichtig für iPhone
 
-    // Zufällige Position
     const x = Math.random() * (window.innerWidth - 120);
     const y = Math.random() * (window.innerHeight - 120);
     
     logo.style.left = x + 'px';
     logo.style.top = y + 'px';
     
-    logo.onclick = () => {
+    // Touch-Reaktion für Boost-Logo
+    const handleBoostTap = (e) => {
+        if (e) e.preventDefault();
         currentScore += 100;
         socket.emit('playerClick', { score: currentScore });
         logo.remove();
     };
+
+    logo.addEventListener('touchstart', handleBoostTap, { passive: false });
+    logo.onclick = handleBoostTap; // Fallback für Desktop
     
     document.body.appendChild(logo);
     
-    // Verschwindet nach 2 Sekunden
     setTimeout(() => { if(logo.parentNode) logo.remove(); }, 2000);
 }
-
-
 
 socket.on('spawnBoost', () => spawnBonusLogo());
 socket.on('error', (msg) => alert(msg));

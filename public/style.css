@@ -181,3 +181,11 @@ input {
     width: 100vw;
     box-sizing: border-box;
 }
+
+#click-button {
+    /* ... deine bisherigen styles ... */
+    touch-action: none; /* Deaktiviert alle Browser-Gesten auf dem Button */
+    -webkit-user-select: none; /* Verhindert Markieren auf iOS */
+    -webkit-touch-callout: none; /* Deaktiviert das Kontextmenü (Rechtsklick-Ersatz) */
+    user-select: none;
+}
