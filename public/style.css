@@ -1,3 +1,37 @@
+/* GANZ OBEN IN DER DATEI */
+html {
+    background-color: #060918; /* Sattes Dunkelblau als Fallback für iOS */
+}
+
+body {
+    background-color: #060918;
+    background-image: radial-gradient(circle at center, #1a1f3c 0%, #060918 100%);
+    background-attachment: fixed; /* Das ersetzt position: fixed für den Hintergrund */
+    color: white;
+    font-family: var(--font-main);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* Verhindert horizontales Wackeln auf iOS */
+    overflow-x: hidden;
+    width: 100vw;
+}
+
+/* Fix für das iPhone Gummiband-Scrollen (Bounce-Effekt) */
+#game-container {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 :root {
     --neon-blue: #00d4ff;
     --neon-pink: #ff00ff;
