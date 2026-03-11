@@ -17,22 +17,17 @@ let validTickets = [];
 function generateTickets() {
     validTickets = [];
     const buchstaben = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    
     while (validTickets.length < 50) {
         let code = "";
-        // Erzeugt 5 zufällige Buchstaben
         for (let i = 0; i < 5; i++) {
             code += buchstaben.charAt(Math.floor(Math.random() * buchstaben.length));
         }
-        
-        // Verhindert doppelte Codes
         if (!validTickets.includes(code)) {
             validTickets.push(code);
         }
     }
     console.log("50 neue Codes generiert:", validTickets);
 }
-// Vergiss nicht, die Funktion direkt darunter einmal aufzurufen:
 generateTickets();
 
 let players = [];
@@ -66,10 +61,11 @@ io.on('connection', (socket) => {
 
     socket.on('adminStartGame', () => {
         registrationOpen = false;
+        // WICHTIG: Signal an Admin senden, dass Einlass jetzt ZU ist
+        io.emit('ticketStatusChanged', false); 
+        
         players.forEach(p => p.score = 0);
         io.emit('updateScoreboard', players);
-        
-        // DAS SIGNAL ZUM FREISCHALTEN
         io.emit('gameStarted'); 
 
         let timeLeft = 60;
@@ -96,7 +92,7 @@ io.on('connection', (socket) => {
         io.emit('updateTicketList', validTickets);
         io.emit('timerUpdate', 60);
         io.emit('gameReset');
-        io.emit('ticketStatusChanged', true);
+        io.emit('ticketStatusChanged', true); // Admin zeigt wieder OFFEN
     });
 
     socket.on('disconnect', () => {

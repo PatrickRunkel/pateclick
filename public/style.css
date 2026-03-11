@@ -1,23 +1,89 @@
 :root { --blue: #00d4ff; --pink: #ff00ff; --bg: #060918; }
+
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
 html, body { 
     background: var(--bg); background-image: radial-gradient(circle, #1a1f3c 0%, #060918 100%);
     color: white; font-family: 'Orbitron', sans-serif; margin: 0; padding: 0;
     width: 100vw; height: 100vh; overflow: hidden; position: fixed;
 }
+
 #game-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; }
+
+/* --- NEU: Das Scoreboard wird hier auf volle Breite gesetzt --- */
+#scoreboard {
+    width: 100%;
+    max-width: 1000px; /* Hier stellst du ein, wie breit die Balken maximal werden */
+    margin-bottom: 20px;
+}
+
 .player-row { display: flex; align-items: center; width: 100%; gap: 10px; margin: 10px 0; }
-.player-name { width: 70px; font-size: 0.7rem; }
-.progress-container { flex-grow: 1; height: 18px; background: rgba(255,255,255,0.1); border-radius: 9px; border: 1px solid var(--blue); overflow: hidden; }
-.progress-bar { height: 100%; background: linear-gradient(90deg, var(--blue), var(--pink)); transition: width 0.3s; }
-.score-val { width: 50px; font-size: 0.7rem; color: var(--blue); }
+
+.player-name { 
+    width: 80px; /* Name bekommt festen Platz */
+    font-size: 0.7rem; 
+    flex-shrink: 0; 
+}
+
+/* Der Balken füllt jetzt den restlichen Platz aus */
+.progress-container { 
+    flex-grow: 1; 
+    height: 20px; 
+    background: rgba(255,255,255,0.1); 
+    border-radius: 10px; 
+    border: 1px solid var(--blue); 
+    overflow: hidden; 
+    box-shadow: inset 0 0 5px #000;
+}
+
+.progress-bar { 
+    height: 100%; 
+    background: linear-gradient(90deg, var(--blue), var(--pink)); 
+    /* Flüssigeres Gleiten bei 10.000 Punkten */
+    transition: width 0.6s cubic-bezier(0.23, 1, 0.32, 1); 
+    box-shadow: 0 0 10px var(--pink);
+}
+
+.score-val { 
+    width: 55px; /* Punktzahl bekommt festen Platz rechts */
+    font-size: 0.7rem; 
+    color: var(--blue); 
+    text-align: right; 
+    flex-shrink: 0;
+}
+
+/* --- LOGIN KARTE --- */
 .card { background: rgba(0,0,0,0.5); padding: 20px; border-radius: 15px; border: 2px solid var(--blue); width: 100%; max-width: 350px; text-align: center; }
 input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid var(--pink); color: white; text-align: center; font-size: 16px; border-radius: 5px; }
-.btn-primary { width: 100%; padding: 15px; background: linear-gradient(45deg, var(--blue), var(--pink)); border: none; color: white; font-weight: bold; border-radius: 10px; }
+.btn-primary { width: 100%; padding: 15px; background: linear-gradient(45deg, var(--blue), var(--pink)); border: none; color: white; font-weight: bold; border-radius: 10px; cursor: pointer; }
+
+/* --- DEIN PINKER BUTTON --- */
 #click-button {
-    /* ... deine anderen Styles ... */
-    opacity: 0.3; /* Standardmäßig ausgegraut */
-    transition: opacity 0.3s ease, transform 0.1s ease;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 6px solid white;
+    background: radial-gradient(circle, #ff00ff, #8a008a);
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
     cursor: pointer;
+    outline: none;
+    margin-top: auto;
+    margin-bottom: 50px;
+    box-shadow: 0 0 30px #ff00ff, inset 0 0 20px rgba(255,255,255,0.3);
+    transition: all 0.3s ease;
+    opacity: 0.3;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
 }
-.hidden { display: none; }
+
+#click-button:active {
+    transform: scale(0.92);
+    box-shadow: 0 0 50px #ff00ff;
+}
+
+.hidden { display: none !important; }

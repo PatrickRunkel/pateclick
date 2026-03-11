@@ -15,7 +15,7 @@
         .btn-start { padding: 15px; background: var(--blue); color: #000; }
         .btn-reset { padding: 15px; background: transparent; color: #ff4444; border: 1px solid #ff4444; }
         #ticket-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-height: 250px; overflow-y: auto; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 12px; }
-        .ticket-btn { background: #161b33; border: 1px solid #2a2f4a; color: var(--blue); padding: 10px 5px; font-size: 0.7rem; font-family: monospace; border-radius: 6px; }
+        .ticket-btn { background: #161b33; border: 1px solid #2a2f4a; color: var(--blue); padding: 10px 5px; font-size: 0.7rem; font-family: monospace; border-radius: 6px; width: 100%; }
         .ticket-btn.copied { background: var(--blue); color: black; }
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--pink); padding: 10px 20px; border-radius: 30px; opacity: 0; transition: 0.3s; pointer-events: none; }
     </style>
@@ -35,11 +35,13 @@
         <div id="ticket-grid"></div>
     </div>
     <div id="toast" class="toast">CODE KOPIERT!</div>
+    
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
         const grid = document.getElementById('ticket-grid');
         const toast = document.getElementById('toast');
+
         socket.on('updateTicketList', (tickets) => {
             grid.innerHTML = '';
             tickets.forEach(code => {
@@ -54,9 +56,11 @@
                 grid.appendChild(btn);
             });
         });
+
         socket.on('ticketStatusChanged', (isOpen) => {
-            document.getElementById('reg-status').innerText = isOpen ? "OFFEN" : "ZU";
-            document.getElementById('reg-status').style.color = isOpen ? "#00ff00" : "#ff4444";
+            const statusEl = document.getElementById('reg-status');
+            statusEl.innerText = isOpen ? "OFFEN" : "ZU";
+            statusEl.style.color = isOpen ? "#00ff00" : "#ff4444";
         });
     </script>
 </body>
