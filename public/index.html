@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#060918">
     <title>PateClick | LIVE</title>
@@ -23,18 +23,22 @@
             <input type="text" id="playerName" placeholder="DEIN NAME">
             <input type="text" id="ticketCode" placeholder="TICKET-CODE">
             <button class="btn-primary" onclick="join()">JETZT BEITRETEN</button>
+            
+            <div class="info-box">
+                <p>⚡ <b>ANMELDEN:</b> Name & Code eingeben.</p>
+                <p>⏳ <b>WARTEN:</b> Auf Admin-Freigabe warten.</p>
+                <p>🚀 <b>ACTION:</b> Button hämmern!</p>
+                <p>💎 <b>JACKPOT:</b> Bonussymbole fangen!</p>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            Dies ist ein kostenloses Geschicklichkeitsspiel. Es wird nicht um echtes Geld gespielt. Keine Gewinnauszahlung!
         </div>
 
         <div id="battle-arena" class="hidden">
             <div id="scoreboard">
-                <div class="player-row">
-                    <span class="player-name">Spieler 1</span>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 70%;"></div>
-                    </div>
-                    <span class="score-val">700</span>
                 </div>
-            </div>
 
             <div class="action-zone">
                 <button id="click-button">CLICK!</button>

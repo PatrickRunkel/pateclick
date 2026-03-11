@@ -3,12 +3,27 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 html, body { 
-    background: var(--bg); background-image: radial-gradient(circle, #1a1f3c 0%, #060918 100%);
-    color: white; font-family: 'Orbitron', sans-serif; margin: 0; padding: 0;
-    width: 100vw; height: 100vh; overflow: hidden; position: fixed;
+    background: var(--bg); 
+    background-image: radial-gradient(circle, #1a1f3c 0%, #060918 100%);
+    color: white; 
+    font-family: 'Orbitron', sans-serif; 
+    margin: 0; 
+    padding: 0;
+    width: 100%; 
+    min-height: 100vh; /* Mindestens so hoch wie der Bildschirm */
+    overflow-x: hidden; /* Verhindert Wackeln nach links/rechts */
+    overflow-y: auto;   /* Erlaubt Scrollen nach unten, wenn der Text zu lang ist */
 }
 
-#game-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; }
+#game-container { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: flex-start; 
+    min-height: 100vh; 
+    padding: 20px; 
+    width: 100%;
+}
 
 /* --- NEU: Das Scoreboard wird hier auf volle Breite gesetzt --- */
 /* 1. Den äußeren Container weiten */
