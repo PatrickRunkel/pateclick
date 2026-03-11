@@ -119,3 +119,21 @@ input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px
 }
 
 .hidden { display: none !important; }
+
+/* Spezieller Header für den Live-Stream */
+.stream-header {
+    width: 100%;
+    background: linear-gradient(180deg, rgba(255, 215, 0, 0.2) 0%, transparent 100%);
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid var(--gold);
+    margin-bottom: 10px;
+}
+
+.stream-title {
+    color: var(--gold);
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px var(--gold);
+    margin: 0;
+}
