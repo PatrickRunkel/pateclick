@@ -11,10 +11,42 @@ html, body {
 #game-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; }
 
 /* --- NEU: Das Scoreboard wird hier auf volle Breite gesetzt --- */
+/* 1. Den äußeren Container weiten */
+#game-container { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: flex-start; /* Ändere center zu flex-start, damit oben mehr Platz ist */
+    height: 100vh; 
+    padding: 10px; /* Reduziere das Padding auf 10px, damit links/rechts mehr Platz ist */
+    width: 100%; 
+}
+
+/* 2. Das Scoreboard auf maximale Breite zwingen */
 #scoreboard {
-    width: 100%;
-    max-width: 1000px; /* Hier stellst du ein, wie breit die Balken maximal werden */
-    margin-bottom: 20px;
+    width: 95%; /* Nutzt fast die gesamte Bildschirmbreite */
+    max-width: 1200px; /* Falls 1000px nicht reicht, geh auf 1200px */
+    margin: 20px auto; 
+    display: block; /* Sicherstellen, dass es ein Block-Element ist */
+}
+
+/* 3. Die Zeile (Row) kontrollieren */
+.player-row { 
+    display: flex; 
+    align-items: center; 
+    width: 100%; 
+    gap: 15px; /* Abstand zwischen Name, Balken und Score */
+    margin: 15px 0; 
+}
+
+/* 4. Den Balken-Container dehnen */
+.progress-container { 
+    flex-grow: 1; /* Das ist die "Feder", die den Balken lang zieht */
+    height: 24px; /* Etwas dicker macht ihn weniger "kugelig" */
+    background: rgba(255,255,255,0.1); 
+    border-radius: 12px; 
+    border: 1px solid var(--blue); 
+    overflow: hidden; 
 }
 
 .player-row { display: flex; align-items: center; width: 100%; gap: 10px; margin: 10px 0; }

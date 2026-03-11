@@ -54,7 +54,7 @@ socket.on('updateScoreboard', (players) => {
     board.innerHTML = '';
     
     players.sort((a, b) => b.score - a.score).forEach(player => {
-        const percent = Math.min((player.score / 10000) * 100, 100); 
+        const percent = Math.min((player.score / 1000) * 100, 100); 
         const row = document.createElement('div');
         row.className = 'player-row';
         row.innerHTML = `
