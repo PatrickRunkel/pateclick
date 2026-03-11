@@ -66,16 +66,17 @@ io.on('connection', (socket) => {
 
     socket.on('adminStartGame', () => {
         registrationOpen = false;
-        io.emit('ticketStatusChanged', false);
-        if (gameTimer) clearInterval(gameTimer);
-        timeLeft = 60;
         players.forEach(p => p.score = 0);
         io.emit('updateScoreboard', players);
-        io.emit('gameStarted');
+        
+        // DAS SIGNAL ZUM FREISCHALTEN
+        io.emit('gameStarted'); 
+
+        let timeLeft = 60;
+        if (gameTimer) clearInterval(gameTimer);
         gameTimer = setInterval(() => {
             timeLeft--;
             io.emit('timerUpdate', timeLeft);
-            if (Math.random() < 0.15) io.emit('spawnBoost');
             if (timeLeft <= 0) {
                 clearInterval(gameTimer);
                 gameTimer = null;

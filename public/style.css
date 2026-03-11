@@ -14,5 +14,10 @@ html, body {
 .card { background: rgba(0,0,0,0.5); padding: 20px; border-radius: 15px; border: 2px solid var(--blue); width: 100%; max-width: 350px; text-align: center; }
 input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid var(--pink); color: white; text-align: center; font-size: 16px; border-radius: 5px; }
 .btn-primary { width: 100%; padding: 15px; background: linear-gradient(45deg, var(--blue), var(--pink)); border: none; color: white; font-weight: bold; border-radius: 10px; }
-#click-button { width: 150px; height: 150px; border-radius: 50%; border: 5px solid white; background: radial-gradient(circle, var(--pink), #6a006a); color: white; font-size: 1.5rem; box-shadow: 0 0 20px var(--pink); touch-action: none; }
+#click-button {
+    /* ... deine anderen Styles ... */
+    opacity: 0.3; /* Standardmäßig ausgegraut */
+    transition: opacity 0.3s ease, transform 0.1s ease;
+    cursor: pointer;
+}
 .hidden { display: none; }
