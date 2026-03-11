@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>PateClick | Stream Overlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Transparentes Design für OBS/TikTok Studio */
+        body { 
+            background: transparent !important; 
+            color: white; 
+            font-family: 'Orbitron', sans-serif; 
+            margin: 20px; 
+            overflow: hidden; 
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 300px;
+        }
+
+        .info-box {
+            background: rgba(0, 0, 0, 0.8);
+            border-left: 6px solid #ff00ff; /* Pinker Rand für Preis */
+            padding: 15px;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+        }
+
+        .slot-box {
+            background: rgba(0, 0, 0, 0.8);
+            border-left: 6px solid #00d4ff; /* Blauer Rand für Slots */
+            padding: 10px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+        .value { font-size: 1.4rem; font-weight: bold; display: block; }
+        .count { color: #00d4ff; font-size: 1.6rem; }
+
+        /* Animation wenn jemand beitritt */
+        .pulse { animation: pulse-blue 0.5s ease-in-out; }
+        @keyframes pulse-blue {
+            0% { text-shadow: 0 0 0px #00d4ff; }
+            50% { text-shadow: 0 0 20px #00d4ff; }
+            100% { text-shadow: 0 0 0px #00d4ff; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="info-box">
+            <span class="label">Champion Belohnung</span>
+            <span class="value">15€ Gutschein</span>
+        </div>
+
+        <div class="slot-box">
+            <span class="label">Arena Plätze</span>
+            <div>
+                <span id="slots" class="count">0</span>
+                <span style="color: #666; font-size: 1.2rem;">/ 10</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const slotsDisplay = document.getElementById('slots');
+
+        // Wenn der Server das Scoreboard aktualisiert, zählen wir die Spieler
+        socket.on('updateScoreboard', (players) => {
+            const count = players.length;
+            
+            // Kleiner Effekt bei Änderung
+            if (slotsDisplay.innerText != count) {
+                slotsDisplay.classList.remove('pulse');
+                void slotsDisplay.offsetWidth; // Trick um Animation neu zu starten
+                slotsDisplay.classList.add('pulse');
+            }
+            
+            slotsDisplay.innerText = count;
+        });
+
+        // Verbindung testen
+        socket.on('connect', () => console.log("Overlay verbunden!"));
