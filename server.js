@@ -32,7 +32,6 @@ generateTickets();
 
 let players = [];
 let gameTimer = null;
-let timeLeft = 60;
 let registrationOpen = true;
 
 io.on('connection', (socket) => {
@@ -61,7 +60,6 @@ io.on('connection', (socket) => {
 
     socket.on('adminStartGame', () => {
         registrationOpen = false;
-        // WICHTIG: Signal an Admin senden, dass Einlass jetzt ZU ist
         io.emit('ticketStatusChanged', false); 
         
         players.forEach(p => p.score = 0);
@@ -70,9 +68,16 @@ io.on('connection', (socket) => {
 
         let timeLeft = 60;
         if (gameTimer) clearInterval(gameTimer);
+        
         gameTimer = setInterval(() => {
             timeLeft--;
             io.emit('timerUpdate', timeLeft);
+
+            // SYMBOLE ERSCHEINEN (37% Chance pro Sekunde)
+            if (Math.random() < 0.40) {
+                io.emit('spawnBoost');
+            }
+
             if (timeLeft <= 0) {
                 clearInterval(gameTimer);
                 gameTimer = null;
@@ -92,7 +97,7 @@ io.on('connection', (socket) => {
         io.emit('updateTicketList', validTickets);
         io.emit('timerUpdate', 60);
         io.emit('gameReset');
-        io.emit('ticketStatusChanged', true); // Admin zeigt wieder OFFEN
+        io.emit('ticketStatusChanged', true); 
     });
 
     socket.on('disconnect', () => {

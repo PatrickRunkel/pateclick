@@ -1,9 +1,8 @@
 const socket = io();
 let currentScore = 0;
-let gameActive = false; // Spiel ist standardmäßig gesperrt
+let gameActive = false; 
 const clickBtn = document.getElementById('click-button');
 
-// Verhindert Zoom bei schnellem Tippen auf Mobilgeräten
 document.addEventListener('touchstart', (e) => {
     if (e.touches.length > 1) e.preventDefault();
 }, { passive: false });
@@ -17,28 +16,24 @@ function join() {
 socket.on('playerAccepted', () => {
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('battle-arena').classList.remove('hidden');
-    // Button beim Beitritt sicherheitshalber auf inaktiv setzen
     if(clickBtn) clickBtn.style.opacity = "0.3";
 });
 
-// SIGNAL VOM SERVER: Spiel startet
 socket.on('gameStarted', () => { 
     currentScore = 0; 
-    gameActive = true; // SPERRE WIRD GELÖST
+    gameActive = true; 
     if(clickBtn) {
-        clickBtn.style.opacity = "1"; // Button wird hell
-        clickBtn.style.boxShadow = "0 0 30px #ff00ff"; // Pinker Glow
+        clickBtn.style.opacity = "1";
+        clickBtn.style.boxShadow = "0 0 30px #ff00ff";
     }
 });
 
 function handleTap(e) {
     if (e) e.preventDefault();
-    
-    // DIE SPERRE: Nur ausführen, wenn gameActive wahr ist
     if (!gameActive) return;
 
     currentScore += 10;
-    socket.emit('playerClick', { score: currentScore });
+    socket.emit('playerClick', { score: currentScore }); 
     
     if(clickBtn) {
         clickBtn.style.transform = "scale(0.92)";
@@ -46,7 +41,6 @@ function handleTap(e) {
     }
 }
 
-// Event-Listener für Klicks & Touch
 if (clickBtn) {
     clickBtn.addEventListener('touchstart', handleTap, { passive: false });
     clickBtn.addEventListener('mousedown', (e) => {
@@ -54,16 +48,13 @@ if (clickBtn) {
     });
 }
 
-// SCOREBOARD MIT 10.000 PUNKTEN ZIEL
 socket.on('updateScoreboard', (players) => {
     const board = document.getElementById('scoreboard');
     if (!board) return;
     board.innerHTML = '';
     
     players.sort((a, b) => b.score - a.score).forEach(player => {
-        // HIER: Berechnung auf 10.000 Punkte
         const percent = Math.min((player.score / 10000) * 100, 100); 
-        
         const row = document.createElement('div');
         row.className = 'player-row';
         row.innerHTML = `
@@ -82,11 +73,10 @@ socket.on('timerUpdate', (time) => {
     if(t) t.innerText = `00:${time < 10 ? '0' + time : time}`;
 });
 
-// SIGNAL VOM SERVER: Spiel beendet
 socket.on('gameFinished', (w) => { 
-    gameActive = false; // SPERRE WIEDER AKTIV
+    gameActive = false; 
     if(clickBtn) {
-        clickBtn.style.opacity = "0.3"; // Button wieder grau
+        clickBtn.style.opacity = "0.3";
         clickBtn.style.boxShadow = "none";
     }
     if (w) alert(`🏆 SIEGER: ${w.name}`); 
@@ -94,31 +84,48 @@ socket.on('gameFinished', (w) => {
 
 socket.on('gameReset', () => location.reload());
 
+// VERBESSERTE BONUS FUNKTION
 function spawnBonusLogo() {
-    if (!gameActive) return; // Bonus nur während des Spiels
-    const img = document.createElement('img');
-    img.src = 'image/logo.jpeg';
-    img.style.cssText = `
-        position:fixed; 
-        z-index:9999; 
-        width:80px; 
-        height:80px; 
-        border-radius:50%; 
-        border:2px solid #00d4ff; 
-        left:${Math.random()*(window.innerWidth-100)}px; 
-        top:${Math.random()*(window.innerHeight-100)}px;
-        cursor: pointer;
-    `;
+    if (!gameActive) return; 
     
-    img.onclick = () => { 
-        currentScore += 100; 
-        socket.emit('playerClick', { score: currentScore }); 
-        img.remove(); 
-    };
+    const img = document.createElement('img');
+    img.src = 'image/logo.jpeg'; 
+    
+    // Styling direkt im JS für garantierte Sichtbarkeit
+    img.style.position = 'fixed';
+    img.style.zIndex = '10000'; // Höher als alles andere
+    img.style.width = '80px';
+    img.style.height = '80px';
+    img.style.borderRadius = '50%';
+    img.style.border = '3px solid #00d4ff';
+    img.style.boxShadow = '0 0 20px #00d4ff';
+    img.style.cursor = 'pointer';
+    
+    // Zufällige Position
+    const x = Math.random() * (window.innerWidth - 100);
+    const y = Math.random() * (window.innerHeight - 150); // Etwas Platz nach unten lassen
+    img.style.left = x + 'px';
+    img.style.top = y + 'px';
+    
+    // Klick-Event
+    img.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        currentScore += 100;
+        socket.emit('playerClick', { score: currentScore });
+        img.remove();
+    });
     
     document.body.appendChild(img);
-    setTimeout(() => { if(img.parentNode) img.remove(); }, 2000);
+    
+    // Automatisches Entfernen nach 2 Sekunden
+    setTimeout(() => {
+        if (img.parentElement) img.remove();
+    }, 850);
 }
 
-socket.on('spawnBoost', spawnBonusLogo);
+socket.on('spawnBoost', () => {
+    console.log("Boost-Signal empfangen!"); // Zum Testen in der Konsole
+    spawnBonusLogo();
+});
+
 socket.on('error', (msg) => alert(msg));
