@@ -16,10 +16,23 @@ app.get('/', (req, res) => {
 let validTickets = [];
 function generateTickets() {
     validTickets = [];
-    for (let i = 1; i <= 50; i++) {
-        validTickets.push("PATE" + i.toString().padStart(2, '0'));
+    const buchstaben = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    
+    while (validTickets.length < 50) {
+        let code = "";
+        // Erzeugt 5 zufällige Buchstaben
+        for (let i = 0; i < 5; i++) {
+            code += buchstaben.charAt(Math.floor(Math.random() * buchstaben.length));
+        }
+        
+        // Verhindert doppelte Codes
+        if (!validTickets.includes(code)) {
+            validTickets.push(code);
+        }
     }
+    console.log("50 neue Codes generiert:", validTickets);
 }
+// Vergiss nicht, die Funktion direkt darunter einmal aufzurufen:
 generateTickets();
 
 let players = [];
