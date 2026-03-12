@@ -288,3 +288,20 @@ input {
         transform: translateY(100vh) rotate(720deg);
     }
 }
+
+#click-button {
+    /* Deaktiviert Standard-Gesten wie Double-Tap-Zoom */
+    touch-action: manipulation; 
+    
+    /* Verhindert, dass Text markiert wird beim schnellen Klicken */
+    user-select: none; 
+    -webkit-user-select: none;
+    
+    /* Verhindert das graue Aufblitzen beim Tippen auf iOS */
+    -webkit-tap-highlight-color: transparent; 
+}
+
+/* Für das gesamte Spiel-Fenster */
+body {
+    touch-action: pan-x pan-y; /* Erlaubt Schieben, aber kein Zoom */
+}

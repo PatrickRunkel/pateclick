@@ -127,3 +127,19 @@ socket.on('timerUpdate', (t) => {
 });
 socket.on('gameReset', () => location.reload());
 socket.on('error', (msg) => alert(msg));
+
+// Verhindert den Zoom-Effekt bei schnellem Tippen auf iOS
+document.addEventListener('touchstart', function (event) {
+    if (event.touches.length > 1) {
+        event.preventDefault(); // Verhindert Multi-Touch-Zoom
+    }
+}, { passive: false });
+
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+    let now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault(); // Verhindert den Double-Tap-Zoom
+    }
+    lastTouchEnd = now;
+}, false);
