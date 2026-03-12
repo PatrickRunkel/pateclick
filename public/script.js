@@ -108,6 +108,22 @@ socket.on('gameFinished', (winner) => {
     }
 });
 
+socket.on('updateScoreboard', (players) => {
+    // ... dein bestehender Code für das Scoreboard ...
+    
+    // Neuer Teil: Zähler aktualisieren
+    const slotsElement = document.getElementById('slots-count');
+    if (slotsElement) {
+        const slotsLeft = 10 - players.length;
+        slotsElement.innerText = slotsLeft > 0 ? slotsLeft : 0;
+        
+        if (slotsLeft <= 0) {
+            slotsElement.parentElement.style.color = "red";
+            slotsElement.parentElement.innerText = "ARENA VOLL - STARTET GLEICH!";
+        }
+    }
+});
+
 socket.on('timerUpdate', (t) => { document.getElementById('timer').innerText = `00:${t < 10 ? '0'+t : t}`; });
 socket.on('gameReset', () => location.reload());
 socket.on('error', (msg) => alert(msg));
