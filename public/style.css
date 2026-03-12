@@ -236,3 +236,55 @@ input {
 .hidden { 
     display: none !important; 
 }
+
+/* Das Sieger-Fenster */
+#winner-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 20000;
+    text-align: center;
+    border: 5px solid var(--gold);
+    transition: opacity 0.5s ease;
+}
+
+.winner-content h1 {
+    font-size: 3rem;
+    color: var(--gold);
+    text-shadow: 0 0 20px var(--gold);
+    margin-bottom: 10px;
+}
+
+.winner-name {
+    font-size: 4rem;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    margin: 20px 0;
+}
+
+.winner-score {
+    font-size: 2rem;
+    color: var(--blue);
+}
+
+/* Kleine Konfetti-Teilchen */
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #ffd700;
+    top: -10px;
+    z-index: 20001;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh) rotate(720deg);
+    }
+}
