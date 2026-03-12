@@ -9,24 +9,18 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/legal', (req, res) => res.sendFile(path.join(__dirname, 'public', 'legal.html')));
 
 let validTickets = [];
 function generateTickets() {
     validTickets = [];
-    const buchstaben = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    while (validTickets.length < 50) {
+    const buchstaben = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    while (validTickets.length < 20) { // Startpool verkleinert auf 20
         let code = "";
-        for (let i = 0; i < 5; i++) {
-            code += buchstaben.charAt(Math.floor(Math.random() * buchstaben.length));
-        }
-        if (!validTickets.includes(code)) {
-            validTickets.push(code);
-        }
+        for (let i = 0; i < 5; i++) code += buchstaben.charAt(Math.floor(Math.random() * buchstaben.length));
+        if (!validTickets.includes(code)) validTickets.push(code);
     }
-    console.log("50 neue Codes generiert:", validTickets);
 }
 generateTickets();
 
@@ -35,10 +29,17 @@ let gameTimer = null;
 let registrationOpen = true;
 
 io.on('connection', (socket) => {
-    // Hier ist 'socket' definiert (für jeden Client einzeln)
     socket.emit('updateTicketList', validTickets);
     socket.emit('ticketStatusChanged', registrationOpen);
     socket.emit('updateScoreboard', players);
+
+    // Neuer Listener für den Admin-Button
+    socket.on('addSingleTicket', (code) => {
+        if(!validTickets.includes(code)) {
+            validTickets.push(code);
+            io.emit('updateTicketList', validTickets);
+        }
+    });
 
     socket.on('joinGame', (data) => {
         if (!registrationOpen) return socket.emit('error', 'Anmeldung geschlossen!');
@@ -65,26 +66,20 @@ io.on('connection', (socket) => {
     });
 
     socket.on('adminStartGame', () => {
+        if(players.length === 0) return;
         registrationOpen = false;
         io.emit('ticketStatusChanged', false); 
         players.forEach(p => p.score = 0);
         io.emit('updateScoreboard', players);
-        
-        // --- STARTSEQUENZ ---
-        io.emit('gameStart'); // Löst den roten 5s Timer im Frontend aus
+        io.emit('gameStart');
 
         setTimeout(() => {
             let timeLeft = 60;
             if (gameTimer) clearInterval(gameTimer);
-            
             gameTimer = setInterval(() => {
                 timeLeft--;
                 io.emit('timerUpdate', timeLeft);
-
-                if (Math.random() < 0.40) {
-                    io.emit('spawnBoost');
-                }
-
+                if (Math.random() < 0.40) io.emit('spawnBoost', { type: Math.random() > 0.5 ? 'diamond' : 'gold' });
                 if (timeLeft <= 0) {
                     clearInterval(gameTimer);
                     gameTimer = null;
@@ -92,7 +87,7 @@ io.on('connection', (socket) => {
                     io.emit('gameFinished', winner);
                 }
             }, 1000);
-        }, 5000); // 5 Sekunden Pause für den roten Countdown
+        }, 5000);
     });
 
     socket.on('adminResetGame', () => {

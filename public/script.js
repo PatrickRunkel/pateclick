@@ -64,6 +64,17 @@ socket.on('updateScoreboard', (players) => {
         `;
         board.appendChild(row);
     });
+
+    // Slot-Zähler Update
+    const slotsElement = document.getElementById('slots-count');
+    if (slotsElement) {
+        const slotsLeft = 10 - players.length;
+        slotsElement.innerText = slotsLeft > 0 ? slotsLeft : 0;
+        if (slotsLeft <= 0) {
+            slotsElement.parentElement.style.color = "#ff4444";
+            slotsElement.parentElement.innerText = "ARENA VOLL - STARTET GLEICH!";
+        }
+    }
 });
 
 function createExplosion(x, y, color) {
@@ -79,7 +90,7 @@ function createExplosion(x, y, color) {
 socket.on('spawnBoost', (data) => {
     if (!gameActive) return;
     const img = document.createElement('img');
-    const type = data.type;
+    const type = data.type || (Math.random() > 0.5 ? 'diamond' : 'gold');
     img.src = type === 'diamond' ? 'https://cdn-icons-png.flaticon.com/512/2953/2953423.png' : 'https://cdn-icons-png.flaticon.com/512/2489/2489756.png';
     img.style.cssText = `position:fixed; z-index:10000; width:70px; height:70px; object-fit:contain; cursor:pointer;`;
     
@@ -96,34 +107,23 @@ socket.on('spawnBoost', (data) => {
     });
 
     document.body.appendChild(img);
-    setTimeout(() => img.remove(), 300);
+    setTimeout(() => img.remove(), 1500); // Länger sichtbar als 300ms für faire Chance
 });
 
 socket.on('gameFinished', (winner) => {
     gameActive = false;
     if (winner) {
-        document.getElementById('final-winner-name').innerText = winner.name;
-        document.getElementById('final-winner-score').innerText = winner.score + " PUNKTE";
+        const winName = document.getElementById('final-winner-name');
+        const winScore = document.getElementById('final-winner-score');
+        if(winName) winName.innerText = winner.name;
+        if(winScore) winScore.innerText = winner.score + " PUNKTE";
         document.getElementById('winner-overlay').classList.remove('hidden');
     }
 });
 
-socket.on('updateScoreboard', (players) => {
-    // ... dein bestehender Code für das Scoreboard ...
-    
-    // Neuer Teil: Zähler aktualisieren
-    const slotsElement = document.getElementById('slots-count');
-    if (slotsElement) {
-        const slotsLeft = 10 - players.length;
-        slotsElement.innerText = slotsLeft > 0 ? slotsLeft : 0;
-        
-        if (slotsLeft <= 0) {
-            slotsElement.parentElement.style.color = "red";
-            slotsElement.parentElement.innerText = "ARENA VOLL - STARTET GLEICH!";
-        }
-    }
+socket.on('timerUpdate', (t) => { 
+    const tElement = document.getElementById('timer');
+    if(tElement) tElement.innerText = `00:${t < 10 ? '0'+t : t}`; 
 });
-
-socket.on('timerUpdate', (t) => { document.getElementById('timer').innerText = `00:${t < 10 ? '0'+t : t}`; });
 socket.on('gameReset', () => location.reload());
 socket.on('error', (msg) => alert(msg));
