@@ -13,10 +13,15 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.ht
 app.get('/legal', (req, res) => res.sendFile(path.join(__dirname, 'public', 'legal.html')));
 
 let validTickets = [];
+let players = [];
+let gameTimer = null;
+let registrationOpen = true;
+let gameActive = false;
+
 function generateTickets() {
     validTickets = [];
-    const buchstaben = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    while (validTickets.length < 20) { // Startpool verkleinert auf 20
+    const buchstaben = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    while (validTickets.length < 20) {
         let code = "";
         for (let i = 0; i < 5; i++) code += buchstaben.charAt(Math.floor(Math.random() * buchstaben.length));
         if (!validTickets.includes(code)) validTickets.push(code);
@@ -24,16 +29,11 @@ function generateTickets() {
 }
 generateTickets();
 
-let players = [];
-let gameTimer = null;
-let registrationOpen = true;
-
 io.on('connection', (socket) => {
     socket.emit('updateTicketList', validTickets);
     socket.emit('ticketStatusChanged', registrationOpen);
     socket.emit('updateScoreboard', players);
 
-    // Neuer Listener für den Admin-Button
     socket.on('addSingleTicket', (code) => {
         if(!validTickets.includes(code)) {
             validTickets.push(code);
@@ -47,7 +47,9 @@ io.on('connection', (socket) => {
         
         if (ticketIndex !== -1 || data.code === "ADMIN") {
             if (players.length < 10) {
-                players.push({ id: socket.id, name: data.name || "Gast", score: 0 });
+                // Falls Spieler mit gleicher ID existiert, erst löschen (Reconnect-Fix)
+                players = players.filter(p => p.id !== socket.id);
+                players.push({ id: socket.id, name: data.name.substring(0,12) || "Gast", score: 0 });
                 if (data.code !== "ADMIN") validTickets.splice(ticketIndex, 1); 
                 
                 socket.emit('playerAccepted'); 
@@ -59,8 +61,9 @@ io.on('connection', (socket) => {
 
     socket.on('playerClick', (data) => {
         const player = players.find(p => p.id === socket.id);
-        if (player) { 
+        if (player && gameActive) { 
             player.score = data.score; 
+            // Schnelles Update an alle
             io.emit('updateScoreboard', players); 
         }
     });
@@ -68,6 +71,7 @@ io.on('connection', (socket) => {
     socket.on('adminStartGame', () => {
         if(players.length === 0) return;
         registrationOpen = false;
+        gameActive = true;
         io.emit('ticketStatusChanged', false); 
         players.forEach(p => p.score = 0);
         io.emit('updateScoreboard', players);
@@ -80,9 +84,11 @@ io.on('connection', (socket) => {
                 timeLeft--;
                 io.emit('timerUpdate', timeLeft);
                 if (Math.random() < 0.40) io.emit('spawnBoost', { type: Math.random() > 0.5 ? 'diamond' : 'gold' });
+                
                 if (timeLeft <= 0) {
                     clearInterval(gameTimer);
                     gameTimer = null;
+                    gameActive = false;
                     const winner = [...players].sort((a, b) => b.score - a.score)[0];
                     io.emit('gameFinished', winner);
                 }
@@ -93,6 +99,7 @@ io.on('connection', (socket) => {
     socket.on('adminResetGame', () => {
         if (gameTimer) clearInterval(gameTimer);
         gameTimer = null;
+        gameActive = false;
         players = [];
         registrationOpen = true;
         generateTickets();
@@ -104,10 +111,17 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        players = players.filter(p => p.id !== socket.id);
-        io.emit('updateScoreboard', players);
+        // 5 Sekunden warten vor dem Löschen (hilft bei kurzen Netzschwankungen)
+        const discoId = socket.id;
+        setTimeout(() => {
+            const stillConnected = io.sockets.sockets.get(discoId);
+            if (!stillConnected) {
+                players = players.filter(p => p.id !== discoId);
+                io.emit('updateScoreboard', players);
+            }
+        }, 5000);
     });
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
+server.listen(PORT, () => console.log(`Server läuft`));

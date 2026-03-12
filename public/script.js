@@ -3,6 +3,19 @@ let currentScore = 0;
 let gameActive = false; 
 const clickBtn = document.getElementById('click-button');
 
+/* --- IOS & TOUCH OPTIMIERUNG --- */
+// Verhindert Double-Tap-Zoom und Multi-Touch Probleme
+document.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
+let lastTouchEnd = 0;
+document.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) e.preventDefault();
+    lastTouchEnd = now;
+}, false);
+
 function join() {
     const name = document.getElementById('playerName').value.trim();
     const code = document.getElementById('ticketCode').value.trim().toUpperCase();
@@ -23,7 +36,7 @@ socket.on('gameStart', () => {
     
     if(clickBtn) {
         clickBtn.disabled = true;
-        clickBtn.style.opacity = "0.2";
+        clickBtn.style.opacity = "0.3";
     }
 
     const interval = setInterval(() => {
@@ -35,17 +48,27 @@ socket.on('gameStart', () => {
             setTimeout(() => {
                 overlay.classList.add('hidden'); 
                 gameActive = true; 
-                if(clickBtn) { clickBtn.disabled = false; clickBtn.style.opacity = "1"; }
-            }, 600);
+                if(clickBtn) { 
+                    clickBtn.disabled = false; 
+                    clickBtn.style.opacity = "1"; 
+                }
+            }, 400);
         }
     }, 1000);
 });
 
+// Der Klick-Handler: Nutzt pointerdown für schnellste Reaktion
 if (clickBtn) {
     clickBtn.addEventListener('pointerdown', (e) => {
         if (!gameActive) return;
+        e.preventDefault(); // WICHTIG: Verhindert Zoom & Ghost-Clicks
+        
         currentScore += 10;
         socket.emit('playerClick', { score: currentScore });
+        
+        // Optisches Feedback
+        clickBtn.style.transform = "scale(0.96)";
+        setTimeout(() => { clickBtn.style.transform = "scale(1)"; }, 50);
     });
 }
 
@@ -53,6 +76,8 @@ socket.on('updateScoreboard', (players) => {
     const board = document.getElementById('scoreboard');
     if (!board) return;
     board.innerHTML = '';
+    
+    // Sortieren nach Punkten
     players.sort((a, b) => b.score - a.score).forEach(player => {
         const percent = Math.min((player.score / 10000) * 100, 100); 
         const row = document.createElement('div');
@@ -65,34 +90,19 @@ socket.on('updateScoreboard', (players) => {
         board.appendChild(row);
     });
 
-    // Slot-Zähler Update
     const slotsElement = document.getElementById('slots-count');
     if (slotsElement) {
         const slotsLeft = 10 - players.length;
         slotsElement.innerText = slotsLeft > 0 ? slotsLeft : 0;
-        if (slotsLeft <= 0) {
-            slotsElement.parentElement.style.color = "#ff4444";
-            slotsElement.parentElement.innerText = "ARENA VOLL - STARTET GLEICH!";
-        }
     }
 });
-
-function createExplosion(x, y, color) {
-    const exp = document.createElement('div');
-    exp.className = 'hit-explosion';
-    exp.style.left = x + 'px'; exp.style.top = y + 'px';
-    exp.style.width = '50px'; exp.style.height = '50px';
-    exp.style.background = color || '#ffd700';
-    document.body.appendChild(exp);
-    setTimeout(() => exp.remove(), 500);
-}
 
 socket.on('spawnBoost', (data) => {
     if (!gameActive) return;
     const img = document.createElement('img');
-    const type = data.type || (Math.random() > 0.5 ? 'diamond' : 'gold');
+    const type = data.type;
     img.src = type === 'diamond' ? 'https://cdn-icons-png.flaticon.com/512/2953/2953423.png' : 'https://cdn-icons-png.flaticon.com/512/2489/2489756.png';
-    img.style.cssText = `position:fixed; z-index:10000; width:70px; height:70px; object-fit:contain; cursor:pointer;`;
+    img.style.cssText = `position:fixed; z-index:10000; width:75px; height:75px; cursor:pointer; touch-action:none;`;
     
     const x = Math.random() * (window.innerWidth - 80);
     const y = Math.random() * (window.innerHeight - 150);
@@ -100,46 +110,31 @@ socket.on('spawnBoost', (data) => {
 
     img.addEventListener('pointerdown', (e) => {
         e.preventDefault();
-        createExplosion(x, y, type === 'diamond' ? '#00d4ff' : '#ffd700');
         currentScore += (type === 'diamond' ? 100 : 50);
         socket.emit('playerClick', { score: currentScore });
         img.remove();
     });
 
     document.body.appendChild(img);
-    setTimeout(() => img.remove(), 1500); // Länger sichtbar als 300ms für faire Chance
+    setTimeout(() => { if(img) img.remove(); }, 1200);
 });
 
 socket.on('gameFinished', (winner) => {
     gameActive = false;
     if (winner) {
-        const winName = document.getElementById('final-winner-name');
-        const winScore = document.getElementById('final-winner-score');
-        if(winName) winName.innerText = winner.name;
-        if(winScore) winScore.innerText = winner.score + " PUNKTE";
+        document.getElementById('final-winner-name').innerText = winner.name;
+        document.getElementById('final-winner-score').innerText = winner.score + " PUNKTE";
         document.getElementById('winner-overlay').classList.remove('hidden');
     }
 });
 
 socket.on('timerUpdate', (t) => { 
-    const tElement = document.getElementById('timer');
-    if(tElement) tElement.innerText = `00:${t < 10 ? '0'+t : t}`; 
+    const timerEl = document.getElementById('timer');
+    if(timerEl) timerEl.innerText = `00:${t < 10 ? '0'+t : t}`; 
 });
-socket.on('gameReset', () => location.reload());
+socket.on('gameReset', () => {
+    currentScore = 0;
+    gameActive = false;
+    location.reload();
+});
 socket.on('error', (msg) => alert(msg));
-
-// Verhindert den Zoom-Effekt bei schnellem Tippen auf iOS
-document.addEventListener('touchstart', function (event) {
-    if (event.touches.length > 1) {
-        event.preventDefault(); // Verhindert Multi-Touch-Zoom
-    }
-}, { passive: false });
-
-let lastTouchEnd = 0;
-document.addEventListener('touchend', function (event) {
-    let now = (new Date()).getTime();
-    if (now - lastTouchEnd <= 300) {
-        event.preventDefault(); // Verhindert den Double-Tap-Zoom
-    }
-    lastTouchEnd = now;
-}, false);
