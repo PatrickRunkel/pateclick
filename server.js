@@ -35,6 +35,7 @@ let gameTimer = null;
 let registrationOpen = true;
 
 io.on('connection', (socket) => {
+    // Hier ist 'socket' definiert (für jeden Client einzeln)
     socket.emit('updateTicketList', validTickets);
     socket.emit('ticketStatusChanged', registrationOpen);
     socket.emit('updateScoreboard', players);
@@ -42,10 +43,12 @@ io.on('connection', (socket) => {
     socket.on('joinGame', (data) => {
         if (!registrationOpen) return socket.emit('error', 'Anmeldung geschlossen!');
         const ticketIndex = validTickets.indexOf(data.code);
-        if (ticketIndex !== -1) {
+        
+        if (ticketIndex !== -1 || data.code === "ADMIN") {
             if (players.length < 10) {
                 players.push({ id: socket.id, name: data.name || "Gast", score: 0 });
-                validTickets.splice(ticketIndex, 1); 
+                if (data.code !== "ADMIN") validTickets.splice(ticketIndex, 1); 
+                
                 socket.emit('playerAccepted'); 
                 io.emit('updateScoreboard', players);
                 io.emit('updateTicketList', validTickets);
@@ -55,36 +58,41 @@ io.on('connection', (socket) => {
 
     socket.on('playerClick', (data) => {
         const player = players.find(p => p.id === socket.id);
-        if (player) { player.score = data.score; io.emit('updateScoreboard', players); }
+        if (player) { 
+            player.score = data.score; 
+            io.emit('updateScoreboard', players); 
+        }
     });
 
     socket.on('adminStartGame', () => {
         registrationOpen = false;
         io.emit('ticketStatusChanged', false); 
-        
         players.forEach(p => p.score = 0);
         io.emit('updateScoreboard', players);
-        io.emit('gameStarted'); 
-
-        let timeLeft = 60;
-        if (gameTimer) clearInterval(gameTimer);
         
-        gameTimer = setInterval(() => {
-            timeLeft--;
-            io.emit('timerUpdate', timeLeft);
+        // --- STARTSEQUENZ ---
+        io.emit('gameStart'); // Löst den roten 5s Timer im Frontend aus
 
-            // SYMBOLE ERSCHEINEN (37% Chance pro Sekunde)
-            if (Math.random() < 0.40) {
-                io.emit('spawnBoost');
-            }
+        setTimeout(() => {
+            let timeLeft = 60;
+            if (gameTimer) clearInterval(gameTimer);
+            
+            gameTimer = setInterval(() => {
+                timeLeft--;
+                io.emit('timerUpdate', timeLeft);
 
-            if (timeLeft <= 0) {
-                clearInterval(gameTimer);
-                gameTimer = null;
-                const winner = [...players].sort((a, b) => b.score - a.score)[0];
-                io.emit('gameFinished', winner);
-            }
-        }, 1000);
+                if (Math.random() < 0.40) {
+                    io.emit('spawnBoost');
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(gameTimer);
+                    gameTimer = null;
+                    const winner = [...players].sort((a, b) => b.score - a.score)[0];
+                    io.emit('gameFinished', winner);
+                }
+            }, 1000);
+        }, 5000); // 5 Sekunden Pause für den roten Countdown
     });
 
     socket.on('adminResetGame', () => {

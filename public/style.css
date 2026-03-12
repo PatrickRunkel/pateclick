@@ -1,6 +1,15 @@
-:root { --blue: #00d4ff; --pink: #ff00ff; --bg: #060918; }
+:root { 
+    --blue: #00d4ff; 
+    --pink: #ff00ff; 
+    --gold: #ffd700;
+    --bg: #060918; 
+}
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* --- GRUNDSTELLUNGEN --- */
+* { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; 
+}
 
 html, body { 
     background: var(--bg); 
@@ -10,9 +19,9 @@ html, body {
     margin: 0; 
     padding: 0;
     width: 100%; 
-    min-height: 100vh; /* Mindestens so hoch wie der Bildschirm */
-    overflow-x: hidden; /* Verhindert Wackeln nach links/rechts */
-    overflow-y: auto;   /* Erlaubt Scrollen nach unten, wenn der Text zu lang ist */
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto; /* Erlaubt Scrollen für Disclaimer/Info */
 }
 
 #game-container { 
@@ -21,154 +30,199 @@ html, body {
     align-items: center; 
     justify-content: flex-start; 
     min-height: 100vh; 
-    padding: 20px; 
-    width: 100%;
-}
-
-/* --- NEU: Das Scoreboard wird hier auf volle Breite gesetzt --- */
-/* 1. Den äußeren Container weiten */
-#game-container { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: flex-start; /* Ändere center zu flex-start, damit oben mehr Platz ist */
-    height: 100vh; 
-    padding: 10px; /* Reduziere das Padding auf 10px, damit links/rechts mehr Platz ist */
+    padding: 10px; 
     width: 100%; 
 }
 
-/* 2. Das Scoreboard auf maximale Breite zwingen */
-#scoreboard {
-    width: 95%; /* Nutzt fast die gesamte Bildschirmbreite */
-    max-width: 1200px; /* Falls 1000px nicht reicht, geh auf 1200px */
-    margin: 20px auto; 
-    display: block; /* Sicherstellen, dass es ein Block-Element ist */
+/* --- LOGO & TIMER --- */
+.main-logo { 
+    max-width: 180px; 
+    height: auto; 
+    margin: 10px 0;
+    border-radius: 10px;
 }
 
-/* 3. Die Zeile (Row) kontrollieren */
+#timer { 
+    font-size: 2.5rem; 
+    color: var(--pink); 
+    text-shadow: 0 0 15px var(--pink); 
+    margin-bottom: 15px; 
+    font-weight: bold;
+}
+
+/* --- SCOREBOARD (CASINO STYLE) --- */
+#scoreboard {
+    width: 95%; 
+    max-width: 1000px; 
+    margin: 10px auto; 
+}
+
 .player-row { 
     display: flex; 
     align-items: center; 
     width: 100%; 
-    gap: 15px; /* Abstand zwischen Name, Balken und Score */
-    margin: 15px 0; 
+    gap: 12px; 
+    margin: 12px 0; 
 }
-
-/* 4. Den Balken-Container dehnen */
-.progress-container { 
-    flex-grow: 1; /* Das ist die "Feder", die den Balken lang zieht */
-    height: 24px; /* Etwas dicker macht ihn weniger "kugelig" */
-    background: rgba(255,255,255,0.1); 
-    border-radius: 12px; 
-    border: 1px solid var(--blue); 
-    overflow: hidden; 
-}
-
-.player-row { display: flex; align-items: center; width: 100%; gap: 10px; margin: 10px 0; }
 
 .player-name { 
-    width: 80px; /* Name bekommt festen Platz */
-    font-size: 0.7rem; 
+    width: 90px; 
+    font-size: 0.75rem; 
     flex-shrink: 0; 
+    white-space: nowrap;
+    color: var(--gold);
 }
 
-/* Der Balken füllt jetzt den restlichen Platz aus */
 .progress-container { 
     flex-grow: 1; 
-    height: 20px; 
-    background: rgba(255,255,255,0.1); 
-    border-radius: 10px; 
+    height: 22px; 
+    background: rgba(255,255,255,0.05); 
+    border-radius: 11px; 
     border: 1px solid var(--blue); 
     overflow: hidden; 
-    box-shadow: inset 0 0 5px #000;
+    box-shadow: inset 0 0 8px #000;
 }
 
 .progress-bar { 
     height: 100%; 
     background: linear-gradient(90deg, var(--blue), var(--pink)); 
-    /* Flüssigeres Gleiten bei 10.000 Punkten */
     transition: width 0.6s cubic-bezier(0.23, 1, 0.32, 1); 
-    box-shadow: 0 0 10px var(--pink);
+    box-shadow: 0 0 15px var(--pink);
 }
 
 .score-val { 
-    width: 55px; /* Punktzahl bekommt festen Platz rechts */
-    font-size: 0.7rem; 
+    width: 60px; 
+    font-size: 0.75rem; 
     color: var(--blue); 
     text-align: right; 
     flex-shrink: 0;
+    font-weight: bold;
 }
 
 /* --- LOGIN KARTE --- */
-.card { background: rgba(0,0,0,0.5); padding: 20px; border-radius: 15px; border: 2px solid var(--blue); width: 100%; max-width: 350px; text-align: center; }
-input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid var(--pink); color: white; text-align: center; font-size: 16px; border-radius: 5px; }
-.btn-primary { width: 100%; padding: 15px; background: linear-gradient(45deg, var(--blue), var(--pink)); border: none; color: white; font-weight: bold; border-radius: 10px; cursor: pointer; }
+.card { 
+    background: rgba(0,0,0,0.7); 
+    padding: 25px; 
+    border-radius: 15px; 
+    border: 2px solid var(--blue); 
+    width: 100%; 
+    max-width: 350px; 
+    text-align: center; 
+    box-shadow: 0 0 25px rgba(0,212,255,0.3);
+}
 
-/* --- DEIN PINKER BUTTON --- */
-#click-button {
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    border: 6px solid white;
-    background: radial-gradient(circle, #ff00ff, #8a008a);
-    color: white;
+input { 
+    width: 100%; 
+    padding: 12px; 
+    margin: 10px 0; 
+    background: #000; 
+    border: 1px solid var(--pink); 
+    color: white; 
+    text-align: center; 
+    font-size: 16px; 
+    border-radius: 8px; 
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.8rem;
-    font-weight: bold;
-    text-shadow: 0 0 10px rgba(0,0,0,0.5);
-    cursor: pointer;
     outline: none;
-    margin-top: auto;
-    margin-bottom: 50px;
-    box-shadow: 0 0 30px #ff00ff, inset 0 0 20px rgba(255,255,255,0.3);
-    transition: all 0.3s ease;
-    opacity: 0.3;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
 }
 
-#click-button:active {
-    transform: scale(0.92);
-    box-shadow: 0 0 50px #ff00ff;
+.btn-primary { 
+    width: 100%; 
+    padding: 16px; 
+    background: linear-gradient(45deg, var(--blue), var(--pink)); 
+    border: none; 
+    color: white; 
+    font-weight: bold; 
+    border-radius: 10px; 
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
 }
 
-.hidden { display: none !important; }
-
-/* Spezieller Header für den Live-Stream */
-.stream-header {
-    width: 100%;
-    background: linear-gradient(180deg, rgba(255, 215, 0, 0.2) 0%, transparent 100%);
-    padding: 10px;
-    text-align: center;
-    border-bottom: 1px solid var(--gold);
-    margin-bottom: 10px;
-}
-
-.stream-title {
-    color: var(--gold);
-    font-size: 1.2rem;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px var(--gold);
-    margin: 0;
+.info-box {
+    margin-top: 20px; 
+    text-align: left; 
+    font-size: 0.7rem; 
+    color: var(--gold); 
+    line-height: 1.5;
+    border-top: 1px solid rgba(255, 215, 0, 0.2);
+    padding-top: 10px;
 }
 
 .disclaimer {
-    /* 1. Ausrichtung */
-    text-align: center;
-    display: block; /* Stellt sicher, dass es sich wie ein Block verhält */
-    
-    /* 2. Zentrierung des Elements */
-    margin: 20px auto; /* 20px Abstand nach oben, 'auto' zentriert es links/rechts */
-    width: 90%; /* Nimmt fast die ganze Breite ein... */
-    max-width: 400px; /* ...aber hört bei 400px auf, damit es lesbar bleibt */
-    
-    /* 3. Optische Gleichmäßigkeit */
-    font-size: 0.6rem;
-    line-height: 1.5; /* Schöner Zeilenabstand */
-    letter-spacing: 0.5px; /* Etwas Luft zwischen den Buchstaben */
-    color: rgba(255, 255, 255, 0.4); /* Dezent, damit es nicht vom Login ablenkt */
-    
-    /* 4. Padding (Sicherheitspuffer) */
-    padding: 0 15px; 
+    text-align: center; 
+    margin: 25px auto; 
+    width: 90%; 
+    max-width: 420px;
+    font-size: 0.6rem; 
+    color: rgba(255, 255, 255, 0.4); 
+    line-height: 1.4;
+}
+
+/* --- COUNTDOWN OVERLAY (FULLSCREEN) --- */
+#start-countdown-overlay {
+    position: fixed !important;
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.96) !important;
+    display: flex !important; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+    z-index: 999999 !important; /* Immer ganz oben */
+}
+
+#start-countdown-overlay.hidden { 
+    display: none !important; 
+}
+
+.countdown-content { 
+    text-align: center; 
+    color: #ff0000; 
+    font-family: 'Orbitron', sans-serif; 
+}
+
+#countdown-number {
+    font-size: 13rem; /* Extrem groß für den Hype */
+    font-weight: bold; 
+    text-shadow: 0 0 60px #ff0000;
+    animation: pulseRed 0.5s infinite alternate;
+}
+
+@keyframes pulseRed {
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(1.15); opacity: 0.7; }
+}
+
+/* --- DER SPIEL-BUTTON (KLASSISCH PINK) --- */
+#click-button {
+    width: 190px; 
+    height: 190px; 
+    border-radius: 50%; 
+    border: 8px solid white;
+    background: radial-gradient(circle, #ff00ff, #8a008a); 
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem; 
+    font-weight: bold; 
+    cursor: pointer; 
+    outline: none;
+    margin-top: auto; 
+    margin-bottom: 40px; 
+    box-shadow: 0 0 40px #ff00ff, inset 0 0 20px rgba(255,255,255,0.4);
+    transition: all 0.1s ease; 
+    opacity: 0.3; /* Halbtransparent bis Start */
+}
+
+#click-button:active { 
+    transform: scale(0.9); 
+    box-shadow: 0 0 60px #ff00ff;
+}
+
+/* --- HELFER --- */
+.hidden { 
+    display: none !important; 
 }

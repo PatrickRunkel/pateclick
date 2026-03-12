@@ -16,7 +16,7 @@
             <img src="image/logo.jpeg" alt="PateClick Logo" class="main-logo">
         </div>
 
-        <div id="timer"></div>
+        <div id="timer">00:00</div>
 
         <div id="login-screen" class="card">
             <h2>SPIELER-LOGIN</h2>
@@ -37,12 +37,17 @@
         </div>
 
         <div id="battle-arena" class="hidden">
-            <div id="scoreboard">
-                </div>
-
+            <div id="scoreboard"></div>
             <div class="action-zone">
                 <button id="click-button">CLICK!</button>
             </div>
+        </div>
+    </div>
+
+    <div id="start-countdown-overlay" class="hidden">
+        <div class="countdown-content">
+            <p>GET READY!</p>
+            <div id="countdown-number">5</div>
         </div>
     </div>
 
