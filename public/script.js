@@ -96,13 +96,16 @@ if (clickBtn) {
 }
 
 // Scoreboard Update
+// Scoreboard Update
 socket.on('updateScoreboard', (players) => {
     const board = document.getElementById('scoreboard');
     if (!board) return;
     board.innerHTML = '';
     
     players.sort((a, b) => b.score - a.score).forEach(player => {
-        const percent = Math.min((player.score / 1000) * 100, 100); 
+        // ÄNDERUNG: Von 1000 auf 10000 erhöhen
+        const percent = Math.min((player.score / 10000) * 100, 100); 
+        
         const row = document.createElement('div');
         row.className = 'player-row';
         row.innerHTML = `
@@ -115,6 +118,7 @@ socket.on('updateScoreboard', (players) => {
         board.appendChild(row);
     });
 });
+
 
 // Timer Update (kommt vom Server)
 socket.on('timerUpdate', (time) => {
@@ -160,7 +164,7 @@ function spawnBonusLogo() {
         img.remove();
     });
     document.body.appendChild(img);
-    setTimeout(() => { if (img.parentElement) img.remove(); }, 400);
+    setTimeout(() => { if (img.parentElement) img.remove(); }, 450);
 }
 
 socket.on('spawnBoost', () => spawnBonusLogo());
