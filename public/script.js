@@ -160,7 +160,7 @@ function spawnBonusLogo() {
         img.remove();
     });
     document.body.appendChild(img);
-    setTimeout(() => { if (img.parentElement) img.remove(); }, 850);
+    setTimeout(() => { if (img.parentElement) img.remove(); }, 400);
 }
 
 socket.on('spawnBoost', () => spawnBonusLogo());
